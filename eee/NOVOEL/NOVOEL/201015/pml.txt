@@ -1,0 +1,14 @@
+if(s_MVD[0].TempR < -49.5)
+{
+ =s_MVD[0].Temp;
+ =s_MVD[0].Dens
+}
+else
+{
+ =s_MVD[0].TempR
+ =s_MVD[0].Dens
+}
+
+
+Dens_a
+Temp_a

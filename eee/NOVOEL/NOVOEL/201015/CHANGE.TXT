@@ -1,0 +1,564 @@
+=====================
+04 Aug 2010
+
+host.h
+
+was:
+struct icp_mod
+{
+int port;
+int addr;
+char name[10];
+int TT;
+int CC;
+int FF;
+};
+
+now:
+struct icp_mod
+{
+int port;
+int addr;
+char name[10];
+int TT;
+int CC;
+int FF;
+int addr0;
+};
+
+host.c
+
+void f_result_Licp(int ii)
+
+was:
+  ICP_MOD[ii][licp_fnd].addr=i;
+  ICP_MOD[ii][licp_fnd].port=ii;
+
+now:
+  ICP_MOD[ii][licp_fnd].addr=i;
+  ICP_MOD[ii][licp_fnd].addr0=licp_addr;
+  ICP_MOD[ii][licp_fnd].port=ii;
+
+
+        if  ((intrpr.wrd[0]=='M') &&(intrpr.wrd[1]=='O') && (intrpr.wrd[2]=='D'))
+        {   //'MOD'
+         i1=ICP_mod_fnd[1]+ICP_mod_fnd[2]+ICP_mod_fnd[3];
+         if( ((i=f_123(4)) >= 0 ) &&  (i< i1 ) )
+         {
+           ICPl_MOD=f_get_mod_str(i);
+
+           addr0  = ICPl_MOD->addr0;
+           addr  = ICPl_MOD->addr;
+           baud   = baudrate_val[ICPl_MOD->CC];
+           TT_par = ICPl_MOD->TT ;
+           FF_par = ICPl_MOD->FF ;
+
+          if((i2=f_dis_set(ds_mod,4,4)) > 0)
+
+
+void f_mod_list()
+was:
+      printf("\n\r%3d %10s      %d    %02X   %6ld",i2,ICPl_MOD->name,ICPl_MOD->port,ICPl_MOD->addr,baudrate_val[ICPl_MOD->CC]);
+
+now:
+     if(ICPl_MOD->addr0 != ICPl_MOD->addr)
+      printf("\n\r%3d %10s      %d \(%02X\)%02X  %6ld",i2,ICPl_MOD->name,ICPl_MOD->port,ICPl_MOD->addr0,ICPl_MOD->addr,baudrate_val[ICPl_MOD->CC]);
+     else
+      printf("\n\r%3d %10s      %d    %02X   %6ld",i2,ICPl_MOD->name,ICPl_MOD->port,ICPl_MOD->addr,baudrate_val[ICPl_MOD->CC]);
+
+=====================
+ 27 Sep 2010
+ valve.c
+
+void f_en_two_valv()
+
+добавлено:
+
+ if( s_MVD[0].Press < P_min_valve)
+ {
+    i_dens &=~CLP0;
+    i_dens &=~OUT1;
+    i_dens &= ~OUT2;
+    return;
+ }
+
+=====================
+30 Sep 2010
+ nfp.c
+   added:
+
+  list1_dsr,
+  15,
+  &AddrSlv,
+  0,
+  255,
+  T_INT,
+//----------------
+....
+  list1_dsr,
+  16,   // Delta :Статус
+  &Delta[0].status,
+  0.,
+  1.,
+  T_INT,
+//-----------
+
+==============================
+18 Oct 2010
+nfp.c
+int f_cycle()
+
+было:
+     if(flag_pool)
+     {
+       if(MMI.status)
+       {
+         if(f_menu_MMI()) return -1;
+         f_MMI();
+       }
+     ....
+
+стало:
+     if(flag_pool)
+     {
+       if(f_menu_MMI()) return -1;
+       if(MMI.status)
+       {
+         f_MMI();
+       }
+     ...
+==============================
+
+21 Oct 2010
+
+slave.c
+dos_win.c
+Добавлен int регистр 18 mode_hst - запрещение ввода дозы из ВРФ.
+Добавлено "Link" на экран ВРФ в начальной странице при наличии связи.
+Добавлена команда '11' - продолжить отпуск дозы с текущего значения.
+
+rtu.c
+rtu.h
+
+ добавлена длина n_buf_RTU_s
+
+  unsigned char buf_tmp[n_buf_RTU_s];
+добавлена функция
+int f_prepareRTU1(char *msg,int *msg_length)
+
+ для контроля ответа Slave в размер n_buf_RTU_s.
+
+==============================
+23 Oct 2010
+
+dos_win.c
+ подправлено отображение при mode_hst != 0.
+
+
+==============================
+04 Nov 2010
+
+slave.c
+
+переменные cod_float, mode_r сделаны недоступными для Host
+
+//&cod_float,         // 32 тип кодировки float (аналогичен рег. 521 MVD,Byte order code for float registers)
+&Slv_int[2],        // 32 фиктивная переменная
+
+//&mode_r,            // 37 режим управл.давлением
+&Slv_int[2],        // 37 фиктивная переменная
+
+
+==============================
+19 Dec 2010
+nfp.c
+
+добавлено
+...
+//-----------
+  list1_dsr,
+  56,
+  &TSD[0].status,
+  0.,
+  1.,
+  T_INT,
+//-----------
+...
+//-----------
+  list1_dsr, //
+  19,
+  &kf_p,
+  0,
+  BIG_P,
+  T_INT_L,
+/*----------------*/
+  list1_dsr, //
+  20,
+  &kf_i,
+  0,
+  BIG_P,
+  T_INT_L,
+/*----------------*/
+  list1_dsr, //
+  21,
+  &kf_d,
+  0,
+  BIG_P,
+  T_INT_L,
+/*----------------*/
+...
+
+
+==============================
+21 Dec 2010
+
+
+nfp.c
+
+//-----------
+was
+  list1_dsr,
+  143,               // Аварийная кн. N вх.
+  &num_in1,
+  0,
+   8,
+  T_INT,
+//-----------
+now
+//-----------
+  list1_dsr,
+  143,               // Аварийная кн. N вх.
+  &num_in1,
+  0,
+  16,
+  T_INT,
+//-----------
+
+==============================
+05 Jan 2011
+valve.c
+
+void f_UP_DN()
+was:
+      if(ltmp > Per_up_min_v)
+       { // UP
+         if( s_MVD[0].Press < P_min_valve)  break;
+         if(ltmp > Per_up_max_v) ltmp = Per_up_max_v;
+now:
+
+      if(ltmp > Per_up_min_v)
+       { // UP
+         if( s_MVD[0].Press < P_min_valve)
+         {
+             Hop= Hop_cur;
+             YfN=Hop<<n_shft;
+             XfN_2  = 0;
+             XfN_1  = 0;
+             break;
+         }
+         if(ltmp > Per_up_max_v) ltmp = Per_up_max_v;
+-----------
+
+reg.h
+
+added
+
+#define Add_lim_h (2000)
+#define Add_lim  (Add_lim_h * k_div)
+
+reg.c
+
+was :
+   if(YfN >  LIM_FLOW_P)
+   {
+      YfN = LIM_FLOW_P;
+   }
+   else  if(YfN <  LIM_FLOW_M )
+   {
+      YfN = LIM_FLOW_M;
+   }
+
+now:
+   if(YfN >  LIM_FLOW_P)
+   {
+      YfN = LIM_FLOW_P;
+   /*
+      YfN-= Add_lim;
+      Hop_cur-=Add_lim_h;
+   */
+   /*
+      YfN     = Add_lim;
+      Hop_cur = Add_lim_h;
+      XfN_2  = 0;
+      XfN_1  = 0;
+   */
+   }
+   else  if(YfN <  LIM_FLOW_M )
+   {
+ //   YfN = LIM_FLOW_M;
+   /*
+      YfN += Add_lim;
+      Hop_cur +=Add_lim_h;
+   */
+
+      YfN  = Add_lim;
+      Hop_cur = Add_lim_h;
+      XfN_2  = 0;
+      XfN_1  = 0;
+   }
+
+==============================
+09 Jan 2011
+dos_win.c
+
+добавлено изменение пароля с клавиатуры ВРФ (4.6 Изменение пароля.)
+
+==============================
+20 Feb 2011
+
+ Добавлен контроль потока до открывания отсечного клапана
+ avt_ctrl.c
+ host.c
+ eee.c
+   Добавлена команда
+ DNO p1 p2 p3 p4;
+ p1 - максимальное время на нормализацию начальных условий, мс
+ p2 - время стабильного состояния (антидребезг) , мс
+ p3 - допустимое значение потока (не более), кг/ч
+ p4 - допустимое значение давления на выходе насоса (не менее),МПа
+ Дополнительные коды ошибок :
+ 0x40 Утечка при старте
+ 0x80 Низкое давление насоса при старте
+==============================
+03 Mar 2011
+
+-------------
+slave.c
+ добавлены данные Slot
+
+// Addr2Slot1 2000
+//  данные, читаемые верхним контроллером
+
+struct eee_dat Slv2_Slot1[]=
+ ...
+// Addr2Slot2   3000
+// данные, записываемые верхним контроллером
+
+struct eee_dat Slv2_Slot2[]=
+...
+
+-------------
+icp.c
+icp.h
+
+введена переменная
+
+int    Reg_err = 0;
+
+и ее установка в
+
+void f_icp_error(struct s_icp_dev *ICP_DEV,int error_type )
+void f_icp_errS(int error_type )
+void f_cl_error()
+-------------
+ введена возможность ввода среза массового и объемного расходов
+ по '9' в основном меню
+ по 'SHT_9' в основном меню - коррекция расхода
+
+==============================
+08 June 2011
+
+ В параметры MMI  введены параметры команды DNO
+
+ DNO p1 p2 p3 p4;
+ p1 - максимальное время на нормализацию начальных условий, мс
+ p2 - время стабильного состояния (антидребезг) , мс
+ p3 - допустимое значение потока (не более), кг/ч
+ p4 - допустимое значение давления на выходе насоса (не менее),МПа
+
+==============================
+16 Jule 2011
+
+host.c
+
+was:
+
+void *list_ns[]={
+...
+&vol_f,             // 23
+
+&s_MVD[0].FlowM,    // 24
+&s_MVD[0].FlowV,    // 25
+
+&ns_fictf,           // 0
+};
+int list_ns_type[]={
+
+
+now:
+
+void *list_ns[]={
+...
+//&vol_f,             // 23
+&dose_dlvr,         // 23
+
+&s_MVD[0].FlowM,    // 24
+&s_MVD[0].FlowV,    // 25
+
+&ns_fictf,           // 0
+};
+
+
+
+---------------------
+
+12 Jule 2013
+
+icp.c
+
+void f_cl_error()
+
+was:
+    WD_PMP_flag=1;
+now:
+//  WD_PMP_flag=1;
+-------
+
+nfp.c
+was:
+  list1_dsr,
+  132,               // Сигнал 'ТРАП' N вх.
+  &num_in6,
+  0,
+  16,
+  T_INT,
+//-----------
+  list1_dsr,
+  133,               // Сигнал 'ТРАП' фл.инв
+  &mski_inp6,
+  0,
+  8,
+  T_INT,
+//-----------
+  list1_dsr,
+  115,               // Сгн.'КОНСОЛЬ' N вх.
+  &num_in7,
+  0,
+  16,
+  T_INT,
+//-----------
+  list1_dsr,
+  116,               // Сгн.'КОНСОЛЬ' фл.инв
+  &mski_inp7,
+  0,
+  8,
+  T_INT,
+//-----------
+
+
+now:
+  list1_dsr,
+  132,               // Сигнал 'ТРАП' N вх.
+  &num_in7,
+  0,
+  16,
+  T_INT,
+//-----------
+  list1_dsr,
+  133,               // Сигнал 'ТРАП' фл.инв
+  &mski_inp7,
+  0,
+  8,
+  T_INT,
+//-----------
+  list1_dsr,
+  115,               // Сгн.'КОНСОЛЬ' N вх.
+  &num_in6,
+  0,
+  16,
+  T_INT,
+//-----------
+  list1_dsr,
+  116,               // Сгн.'КОНСОЛЬ' фл.инв
+  &mski_inp6,
+  0,
+  8,
+  T_INT,
+//-----------
+
+=================
+
+12 Mar 2014
+
+valve.c
+
+void  f_init_add()
+was:
+ if( (vol_f - Vol_add_end) > 0)
+    add_mul=  conc_t *0.001 * (vol_f/ (vol_f - Vol_add_end));
+ else
+    add_mul=1.;
+
+now:
+ if( (vol_f - Vol_add_end) > 0)
+    add_mul=  conc_t *0.001 * (vol_f/ (vol_f - Vol_add_end));
+ else
+    add_mul=conc_t *0.001;
+
+
+------------
+
+void f_ADD()
+
+
+--------------------
+was:
+ if((fl_GO == 0) || (N_resv < 2) )
+now:
+// if((fl_GO == 0) || (N_resv < 2)  ||(  (OUT_VAR & (OUT1| OUT2)) == 0) )
+ if((fl_GO == 0) || (N_resv < 2)  ||(  (OUT_VAR & (OUT1)) == 0) )
+
+--------------------
+now:
+
+  m1:
+      if(Add_cur == add_end)
+      {
+        State_Add =  HOLD;
+        break;
+      }
+
+      if((vol_f - VolT_int) <= Vol_add_end)
+      {
+        Add_dem=add_end ;
+        ftmp=add_end-Add_cur;
+        goto m2;
+      }
+      else
+      {
+        Add_dem = VolT_int * add_mul ;
+  /*
+        if( VolT_int <  Vol_beg)
+        {
+
+          break;
+        }
+  */
+        if(VolT_int <  Vol_add_beg)
+        {
+
+          break;
+        }
+
+
+      }
+=================
+avt_ctrl.c
+
+
+      f_init_add();
+перенесена
+
+   case  11:
+
+

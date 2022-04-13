@@ -1,0 +1,10 @@
+Turbo C++ Version 3.00 Copyright (c) 1992 Borland International
+nfp.c:
+mod1.c:
+Warning pmlan.c 1342: Parameter 'type' is never used in function f_stor_pmp
+Warning pmlan.c 1342: Parameter 'buf' is never used in function f_stor_pmp
+Warning pmlan.c 1342: Parameter 'buf_n' is never used in function f_stor_pmp
+mod2.c:
+Turbo Link  Version 5.0 Copyright (c) 1992 Borland International
+
+        Available memory 3360256
